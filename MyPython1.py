@@ -32,6 +32,7 @@ def main():
     sol2_name = 'solution2.txt'
     gdx_name = 'pscopf.gdx'
     gms_name = 'run_greedy.gms'
+    #gms_name = 'run_full.gms'
     gams_work_dir = 'src/gams/'
 
     print '\nPython/GAMS benchmark solver'

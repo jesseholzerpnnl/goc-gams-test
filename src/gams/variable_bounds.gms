@@ -5,6 +5,7 @@ $offtext
 
 * global bounds independent of any decomposition algorithm
 genPlCoeffVar.lo(i,j,i1)$GenPl(i,j,i1) = 0;
+#genPlCoeffVar.up(i,j,i1)$GenPl(i,j,i1) = 1;
 busVoltMagVar.up(i)$Bus(i) = BusVMax(i);
 busVoltMagVar.lo(i)$Bus(i) = BusVMin(i);
 busPowRealBalanceOverViolVar.lo(i)$Bus(i) = 0;
@@ -39,5 +40,7 @@ swshCtgAdmImagVar.up(i,k)$(SwshActive(i) and Ctg(k)) = SwshBMax(i);
 swshCtgAdmImagVar.lo(i,k)$(SwshActive(i) and Ctg(k)) = SwshBMin(i);
 genCtgPowRealOverVar.lo(i,j,k)$genCtgParticipating(i,j,k) = 0;
 genCtgPowRealUnderVar.lo(i,j,k)$genCtgParticipating(i,j,k) = 0;
+genCtgPowRealOverVar.up(i,j,k)$genCtgParticipating(i,j,k) = 0;
+genCtgPowRealUnderVar.up(i,j,k)$genCtgParticipating(i,j,k) = 0;
 busCtgVoltMagOverVar.lo(i,k)$BusCtgVoltMagMaintDom(i,k) = 0;
 busCtgVoltMagUnderVar.lo(i,k)$BusCtgVoltMagMaintDom(i,k) = 0;

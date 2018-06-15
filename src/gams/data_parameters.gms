@@ -53,12 +53,16 @@ alias(Name,k,k0,k1,k2,k3,k4);
 parameters
   BaseMVA
   BusBaseKV
+  BusVM(Num)
+  BusVA(Num)
   BusVMax(Num)
   BusVMin(Num)
   LoadP(Num,Ident)
   LoadQ(Num,Ident)
   FxshG(Num,Ident)
   FxshB(Num,Ident)
+  GenP(Num,Ident)
+  GenQ(Num,Ident)
   GenQMax(Num,Ident)
   GenQMin(Num,Ident)
   GenPMax(Num,Ident)
@@ -75,6 +79,7 @@ parameters
   XfmrRatio(Num,Num,Ident)
   XfmrAng(Num,Num,Ident)
   XfmrFlowMax(Num,Num,Ident)
+  SwshBInit(Num)
   SwshBMax(Num)
   SwshBMin(Num)
   GenPlX(Num,Ident,Num)
@@ -109,12 +114,16 @@ $loaddc XfmrCtgInactive
 $loaddc AreaCtgAffected
 $loaddc BaseMVA
 $loaddc BusBaseKV
+$loaddc BusVM
+$loaddc BusVA
 $loaddc BusVMax
 $loaddc BusVMin
 $loaddc LoadP
 $loaddc LoadQ
 $loaddc FxshG
 $loaddc FxshB
+$loaddc GenP
+$loaddc GenQ
 $loaddc GenQMax
 $loaddc GenQMin
 $loaddc GenPMax
@@ -131,6 +140,7 @@ $loaddc XfmrB
 $loaddc XfmrRatio
 $loaddc XfmrAng
 $loaddc XfmrFlowMax
+$loaddc SwshBInit
 $loaddc SwshBMax
 $loaddc SwshBMin
 $loaddc GenPlX
@@ -154,10 +164,21 @@ GenBusCtgVoltMagMaintDom(i1,j1,i,k)
   $(GenCtgActive(i1,j1,k) and GenBusVReg(i1,j1,i) and GenQMin(i1,j1) < GenQMax(i1,j1)) = yes;
 BusCtgVoltMagMaintDom(i,k)
   $(sum((i1,j1)$GenBusCtgVoltMagMaintDom(i1,j1,i,k),1) > 0) = yes;
-display
-  genCtgParticipating
-  genAreaCtgParticipating;
 
+# display selected data parameters for debugging
+display
+  Num
+  BusVM
+  BusVA
+  GenP
+  GenQ
+  SwshBInit
+#  genCtgParticipating
+#  genAreaCtgParticipating
+;
+
+# display all data parameters
+$ontext
 display
   Num
   Ident
@@ -186,12 +207,16 @@ display
   AreaCtgAffected
   BaseMVA
   BusBaseKV
+  BusVM
+  BusVA
   BusVMax
   BusVMin
   LoadP
   LoadQ
   FxshG
   FxshB
+  GenP
+  GenQ
   GenQMax
   GenQMin
   GenPMax
@@ -208,8 +233,10 @@ display
   XfmrRatio
   XfmrAng
   XfmrFlowMax
+  SwshBInit
   SwshBMax
   SwshBMin
   GenPlX
   GenPlY
 ;
+$offtext

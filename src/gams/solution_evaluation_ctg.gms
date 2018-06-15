@@ -23,11 +23,14 @@ fxshCtgPowImag(i,j,k)$(Fxsh(i,j) and Ctg(k))
   = - FxshB(i,j) * sqr(busCtgVoltMag(i,k)) $FxshActive(i,j);
 genCtgPowReal(i,j,k)$(Gen(i,j) and Ctg(k))
   = genPowReal(i,j)$(GenCtgActive(i,j,k) and not GenCtgParticipating(i,j,k))
-  + max(GenPMin(i,j),
-        min(GenPMax(i,j),
-	      genPowReal(i,j)
-            + GenPartFact(i,j)
-	    * sum(i1$GenArea(i,j,i1),areaCtgPowRealChange(i1,k))))$GenCtgParticipating(i,j,k);
+#  + max(GenPMin(i,j),
+#        min(GenPMax(i,j),
+#	      genPowReal(i,j)
+#            + GenPartFact(i,j)
+#	    * sum(i1$GenArea(i,j,i1),areaCtgPowRealChange(i1,k))))$GenCtgParticipating(i,j,k);
+  + (  genPowReal(i,j)
+     + GenPartFact(i,j)
+     * sum(i1$GenArea(i,j,i1),areaCtgPowRealChange(i1,k)))$GenCtgParticipating(i,j,k);
 lineCtgCurrReal1(i1,i2,j,k)$(Line(i1,i2,j) and Ctg(k))
   = (  LineG(i1,i2,j) * (busCtgVoltMag(i1,k) * cos(busCtgVoltAng(i1,k)) - busCtgVoltMag(i2,k) * cos(busCtgVoltAng(i2,k)))
      - LineB(i1,i2,j) * (busCtgVoltMag(i1,k) * sin(busCtgVoltAng(i1,k)) - busCtgVoltMag(i2,k) * sin(busCtgVoltAng(i2,k)))

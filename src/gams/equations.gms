@@ -12,6 +12,7 @@ $offtext
 
 equations
   costDef
+  objDefFull
   objDefSubBase
   objDefSubCtg
   genCostExpansionByPl(i,j)
@@ -25,6 +26,8 @@ equations
   fxshPowImagDef(i,j)
   lineCurrMag1Bound(i1,i2,j)
   lineCurrMag2Bound(i1,i2,j)
+  lineCurrMag1DenseBound(i1,i2,j)
+  lineCurrMag2DenseBound(i1,i2,j)
   lineCurrReal1Def(i1,i2,j)
   lineCurrImag1Def(i1,i2,j)
   lineCurrReal2Def(i1,i2,j)
@@ -35,6 +38,8 @@ equations
   linePowImag2Def(i1,i2,j)
   xfmrPowMag1Bound(i1,i2,j)
   xfmrPowMag2Bound(i1,i2,j)
+  xfmrPowMag1DenseBound(i1,i2,j)
+  xfmrPowMag2DenseBound(i1,i2,j)
   xfmrCurrReal1Def(i1,i2,j)
   xfmrCurrImag1Def(i1,i2,j)
   xfmrCurrReal2Def(i1,i2,j)
@@ -52,6 +57,8 @@ equations
   fxshCtgPowImagDef(i,j,k)
   lineCtgCurrMag1Bound(i1,i2,j,k)
   lineCtgCurrMag2Bound(i1,i2,j,k)
+  lineCtgCurrMag1DenseBound(i1,i2,j,k)
+  lineCtgCurrMag2DenseBound(i1,i2,j,k)
   lineCtgCurrReal1Def(i1,i2,j,k)
   lineCtgCurrImag1Def(i1,i2,j,k)
   lineCtgCurrReal2Def(i1,i2,j,k)
@@ -62,6 +69,8 @@ equations
   lineCtgPowImag2Def(i1,i2,j,k)
   xfmrCtgPowMag1Bound(i1,i2,j,k)
   xfmrCtgPowMag2Bound(i1,i2,j,k)
+  xfmrCtgPowMag1DenseBound(i1,i2,j,k)
+  xfmrCtgPowMag2DenseBound(i1,i2,j,k)
   xfmrCtgCurrReal1Def(i1,i2,j,k)
   xfmrCtgCurrImag1Def(i1,i2,j,k)
   xfmrCtgCurrReal2Def(i1,i2,j,k)

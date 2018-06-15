@@ -61,8 +61,8 @@ def write_psse_to_gdx_db(psse_data, db):
     #bus_area = db.add_parameter('bus_area', 1)
     #bus_area = db.add_parameter('bus_area', 1)
     #bus_owner = db.add_parameter('bus_owner', 1)
-    #bus_vm = db.add_parameter('bus_vm', 1)
-    #bus_va = db.add_parameter('bus_va', 1)
+    bus_vm = db.add_parameter('BusVM', 1)
+    bus_va = db.add_parameter('BusVA', 1)
     bus_v_max = db.add_parameter('BusVMax', 1)
     bus_v_min = db.add_parameter('BusVMin', 1)
     #bus_evhi = db.add_parameter('bus_evhi', 1)
@@ -85,8 +85,8 @@ def write_psse_to_gdx_db(psse_data, db):
     fxsh_b = db.add_parameter('FxshB', 2)
     
     # generator parameters
-    #gen_pg = db.add_parameter('gen_pq', 2)
-    #gen_qg = db.add_parameter('gen_qg', 2)
+    gen_pg = db.add_parameter('GenP', 2)
+    gen_qg = db.add_parameter('GenQ', 2)
     gen_q_max = db.add_parameter('GenQMax', 2)
     gen_q_min = db.add_parameter('GenQMin', 2)
     #gen_vs = db.add_parameter('gen_vs', 2)
@@ -145,7 +145,7 @@ def write_psse_to_gdx_db(psse_data, db):
     #swsh_swrem = db.add_parameter('swsh_swrem', 1)
     #swsh_rmpct = db.add_parameter('swsh_rmpct', 1)
     #swsh_rmidnt = db.add_parameter('swsh_rmidnt', 1)
-    #swsh_b_init = db.add_parameter('SwshBInit', 1)
+    swsh_b_init = db.add_parameter('SwshBInit', 1)
     swsh_b_max = db.add_parameter('SwshBMax', 1)
     swsh_b_min = db.add_parameter('SwshBMin', 1)
     #swsh_n1 = db.add_parameter('swsh_n1', 1)
@@ -213,8 +213,9 @@ def write_psse_to_gdx_db(psse_data, db):
         #bus_ide.add_record(key).value = r.ide
         #bus_area.add_record(key).value = r.area
         #bus_owner.add_record(key).value = r.owner
-        #bus_vm.add_record(key).value = r.vm
-        #bus_va.add_record(key).value = r.va
+        bus_vm.add_record(key).value = r.vm
+        bus_va.add_record(key).value = r.va * math.pi / 180.0
+        #print "bus va should be in radians?: %f" % (r.va * math.pi / 180.0) # todo remove this on checking correctness
         bus_v_max.add_record(key).value = r.nvhi
         bus_v_min.add_record(key).value = r.nvlo
         #bus_evhi.add_record(key).value = r.evhi
@@ -250,8 +251,8 @@ def write_psse_to_gdx_db(psse_data, db):
         gen.add_record(key)
         if r.stat > 0:
             gen_active.add_record(key).value
-        #gen_pg.add_record(key).value = r.pg
-        #gen_qg.add_record(key).value = r.qg
+        gen_pg.add_record(key).value = r.pg / psse_data.raw.case_identification.sbase
+        gen_qg.add_record(key).value = r.qg / psse_data.raw.case_identification.sbase
         gen_q_max.add_record(key).value = r.qt / psse_data.raw.case_identification.sbase
         gen_q_min.add_record(key).value = r.qb / psse_data.raw.case_identification.sbase
         #gen_vs.add_record(key).value = r.vs
@@ -328,7 +329,7 @@ def write_psse_to_gdx_db(psse_data, db):
         #    swsh_bus_v_reg.add_record((str(r.i), str(r.i)))
         #else:
         #    swsh_bus_v_reg.add_record((str(r.i), str(r.swrem)))
-        #swsh_b_init.add_record(key).value = r.binit / psse_data.raw.case_identification.sbase # todo normalize ?
+        swsh_b_init.add_record(key).value = r.binit / psse_data.raw.case_identification.sbase # todo normalize ?
         swsh_b_max.add_record(key).value = (
             max(0.0, r.n1 * r.b1) +
             max(0.0, r.n2 * r.b2) +

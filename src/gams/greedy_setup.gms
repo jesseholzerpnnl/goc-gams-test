@@ -3,14 +3,14 @@ $ontext
 set up solver options, etc., for greedy method
 $offtext
 
+VoltMaintLinSoft = 1;
+VoltMaintQuadSoft = 0;
+VoltMaintViolPen = 1e3; 
 VoltMagViolPen = 1e3;
 PowFlowMagViolPen = 1e5;
 CurrFlowMagViolPen = 1e5;
 PowBalanceViolPen = 1e5;
-VoltMagBoundSoft = 0;
-PowFlowMagBoundSoft = 0;
-CurrFlowMagBoundSoft = 0;
-PowBalanceSoft = 1;
+AbsSmoothing = 1e-1;
 # why do we need soft constraints for power and current bounds?
 # if we fix generator bus voltage magnitudes in contingency
 # to those in the base case then the flows on adjacent lines
@@ -22,7 +22,7 @@ option
   limrow = 0
   limcol = 0
   solprint = off
-  nlp = ipopth # knitro, ipopt, ipopth
+  nlp = knitro # knitro, ipopt, ipopth, conopt, snopt, lindo
   mpec = knitro # knitro, nlpec: NLP reformulation of equilibrium constraints
 ;
 
@@ -96,7 +96,7 @@ $offecho
 * ipopth is pretty good
 * need to experiment with options and scaling
 $onecho > ipopth.opt
-#max_iter 10
+*max_iter 10
 #hessian_approximation limited-memory
 acceptable_tol 1e-3
 acceptable_iter 5
@@ -130,12 +130,12 @@ putclose;
 LogFile.ap = 1;
 
 * initialization
-#GenPowReal(i,j)$GenActive(i,j) = 0;
+GenPowReal(i,j)$GenActive(i,j) = GenP(i,j);
 GenPowRealCoeff1(i,j)$GenActive(i,j) = 0;
 GenPowRealCoeff2(i,j)$GenActive(i,j) = 0;
 #GenCtgPowRealDup(i,j,k)$GenCtgActive(i,j,k) = 0;
 #GenCtgPowRealMult(i,j,k)$GenCtgActive(i,j,k) = 0;
-BusVoltMag(i)$Bus(i) = max(BusVMin(i),min(BusVMax(i),1.0));
+BusVoltMag(i)$Bus(i) = BusVM(i);
 BusVoltMagCoeff1(i)$Bus(i) = 0;
 BusVoltMagCoeff2(i)$Bus(i) = 0;
 BusCtgVoltMag(i,k)$(Bus(i) and Ctg(k)) = BusVoltMag(i);
@@ -144,6 +144,7 @@ CtgActive(k)$Ctg(k) = no;
 * variable initialization
 BusVoltMagVar.l(i)$Bus(i) = BusVoltMag(i);
 BusCtgVoltMagVar.l(i,k)$(Bus(i) and Ctg(k)) = BusCtgVoltMag(i,k);
+
 
 * iterations
 put LogDetailed;

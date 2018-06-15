@@ -28,10 +28,16 @@ parameters
   PowFlowMagViolPen
   CurrFlowMagViolPen
   PowBalanceViolPen
+  VoltMaintViolPen
   VoltMagBoundSoft
   PowFlowMagBoundSoft
   CurrFlowMagBoundSoft
-  PowBalanceSoft
+  PowBalanceLinSoft
+  PowBalanceQuadSoft
+  PowBalanceDense
+  VoltMaintLinSoft
+  VoltMaintQuadSoft
+  AbsSmoothing
   
   GenPowReal(i,j)
   GenPowRealChange(i,j)
