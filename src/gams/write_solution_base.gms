@@ -10,12 +10,13 @@ file solution1 /'%solution1%'/;
 
 put solution1;
 put '--bus section' /;
-put 'I, VM, VA' /;
+put 'I, VM, VA, B' /;
 loop(i$Bus(i),
   put
     i.tl:0 ', '
     busVoltMagSol(i):0:10 ', '
-    busVoltAngSol(i):0:10 /;
+    busVoltAngSol(i):0:10 ', '
+    busSwshAdmImagSol(i):0:10 /;
 );
 put '--generator section' /;
 put 'I, ID, P, Q' /;
@@ -25,12 +26,5 @@ loop((i,j)$Gen(i,j),
     j.tl:0 ', '
     genPowRealSol(i,j):0:10 ', '
     genPowImagSol(i,j):0:10 /;
-);
-put '--switched shunt section' /;
-put 'I, B' /;
-loop(i$Swsh(i),
-  put
-    i.tl:0 ', '
-    swshAdmImagSol(i):0:10 /;
 );
 putclose;

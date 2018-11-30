@@ -32,7 +32,6 @@ sets
   XfmrActive(Num,Num,Ident)
   SwshActive(Num)
   CtgActive(Name)
-  GenBusVReg(Num,Ident,Num)
   GenPl(Num,Ident,Num)
   GenArea(Num,Ident,Num)
   GenCtgInactive(Num,Ident,Name)
@@ -42,8 +41,8 @@ sets
   LineCtgActive(Num,Num,Ident,Name)
   XfmrCtgActive(Num,Num,Ident,Name)
   AreaCtgAffected(Num,Name)
-  BusCtgVoltMagMaintDom(Num,Name)
-  GenBusCtgVoltMagMaintDom(Num,Ident,Num,Name)
+  #BusCtgVoltMagMaintDom(Num,Name)
+  #GenBusCtgVoltMagMaintDom(Num,Ident,Num,Name)
 ;
 
 alias(Num,i,i0,i1,i2,i3,i4);
@@ -52,11 +51,12 @@ alias(Name,k,k0,k1,k2,k3,k4);
 
 parameters
   BaseMVA
-  BusBaseKV
   BusVM(Num)
   BusVA(Num)
   BusVMax(Num)
   BusVMin(Num)
+  BusVMaxK(Num)
+  BusVMinK(Num)
   LoadP(Num,Ident)
   LoadQ(Num,Ident)
   FxshG(Num,Ident)
@@ -72,6 +72,7 @@ parameters
   LineB(Num,Num,Ident)
   LineBCh(Num,Num,Ident)
   LineFlowMax(Num,Num,Ident)
+  LineFlowMaxK(Num,Num,Ident)
   XfmrGMag(Num,Num,Ident)
   XfmrBMag(Num,Num,Ident)
   XfmrG(Num,Num,Ident)
@@ -79,6 +80,7 @@ parameters
   XfmrRatio(Num,Num,Ident)
   XfmrAng(Num,Num,Ident)
   XfmrFlowMax(Num,Num,Ident)
+  XfmrFlowMaxK(Num,Num,Ident)
   SwshBInit(Num)
   SwshBMax(Num)
   SwshBMin(Num)
@@ -105,7 +107,6 @@ $loaddc GenActive
 $loaddc LineActive
 $loaddc XfmrActive
 $loaddc SwshActive
-$loaddc GenBusVReg
 $loaddc GenPl
 $loaddc GenArea
 $loaddc GenCtgInactive
@@ -113,11 +114,12 @@ $loaddc LineCtgInactive
 $loaddc XfmrCtgInactive
 $loaddc AreaCtgAffected
 $loaddc BaseMVA
-$loaddc BusBaseKV
 $loaddc BusVM
 $loaddc BusVA
 $loaddc BusVMax
 $loaddc BusVMin
+$loaddc BusVMaxK
+$loaddc BusVMinK
 $loaddc LoadP
 $loaddc LoadQ
 $loaddc FxshG
@@ -133,6 +135,7 @@ $loaddc LineG
 $loaddc LineB
 $loaddc LineBCh
 $loaddc LineFlowMax
+$loaddc LineFlowMaxK
 $loaddc XfmrGMag
 $loaddc XfmrBMag
 $loaddc XfmrG
@@ -140,6 +143,7 @@ $loaddc XfmrB
 $loaddc XfmrRatio
 $loaddc XfmrAng
 $loaddc XfmrFlowMax
+$loaddc XfmrFlowMaxK
 $loaddc SwshBInit
 $loaddc SwshBMax
 $loaddc SwshBMin
@@ -149,36 +153,36 @@ $gdxin
 
 * compute from loaded data
 * might want to put these in a separate gams file
-GenCtgActive(i,j,k)$(GenActive(i,j) and Ctg(k) and not GenCtgInactive(i,j,k)) = yes;
-LineCtgActive(i1,i2,j,k)$(LineActive(i1,i2,j) and Ctg(k) and not LineCtgInactive(i1,i2,j,k)) = yes;
-XfmrCtgActive(i1,i2,j,k)$(XfmrActive(i1,i2,j) and Ctg(k) and not XfmrCtgInactive(i1,i2,j,k)) = yes;
+#GenCtgActive(i,j,k)$(GenActive(i,j) and Ctg(k) and not GenCtgInactive(i,j,k)) = yes;
+#LineCtgActive(i1,i2,j,k)$(LineActive(i1,i2,j) and Ctg(k) and not LineCtgInactive(i1,i2,j,k)) = yes;
+#XfmrCtgActive(i1,i2,j,k)$(XfmrActive(i1,i2,j) and Ctg(k) and not XfmrCtgInactive(i1,i2,j,k)) = yes;
 * compute gen_area from bus_area?
 * compute area_ctg_affected?
 * useful sets and params
-set
-  GenCtgParticipating(Num,Ident,Name)
-  GenAreaCtgParticipating(Num,Ident,Num,Name);
-GenAreaCtgParticipating(i,j,i1,k)$(GenArea(i,j,i1) and AreaCtgAffected(i1,k) and GenCtgActive(i,j,k)) = yes;
-GenCtgParticipating(i,j,k)$GenCtgActive(i,j,k) = sum(i1$GenAreaCtgParticipating(i,j,i1,k),1);
-GenBusCtgVoltMagMaintDom(i1,j1,i,k)
-  $(GenCtgActive(i1,j1,k) and GenBusVReg(i1,j1,i) and GenQMin(i1,j1) < GenQMax(i1,j1)) = yes;
-BusCtgVoltMagMaintDom(i,k)
-  $(sum((i1,j1)$GenBusCtgVoltMagMaintDom(i1,j1,i,k),1) > 0) = yes;
+#set
+#  GenCtgParticipating(Num,Ident,Name)
+#  GenAreaCtgParticipating(Num,Ident,Num,Name);
+#GenAreaCtgParticipating(i,j,i1,k)$(GenArea(i,j,i1) and AreaCtgAffected(i1,k) and GenCtgActive(i,j,k)) = yes;
+#GenCtgParticipating(i,j,k)$GenCtgActive(i,j,k) = sum(i1$GenAreaCtgParticipating(i,j,i1,k),1);
+#GenBusCtgVoltMagMaintDom(i1,j1,i,k)
+#  $(GenCtgActive(i1,j1,k) and GenBusVReg(i1,j1,i) and GenQMin(i1,j1) < GenQMax(i1,j1)) = yes;
+#BusCtgVoltMagMaintDom(i,k)
+#  $(sum((i1,j1)$GenBusCtgVoltMagMaintDom(i1,j1,i,k),1) > 0) = yes;
 
 # display selected data parameters for debugging
-display
-  Num
-  BusVM
-  BusVA
-  GenP
-  GenQ
-  SwshBInit
+#display
+#  Num
+#  BusVM
+#  BusVA
+#  GenP
+#  GenQ
+#  SwshBInit
 #  genCtgParticipating
 #  genAreaCtgParticipating
 ;
 
 # display all data parameters
-$ontext
+#$ontext
 display
   Num
   Ident
@@ -198,7 +202,6 @@ display
   LineActive
   XfmrActive
   SwshActive
-  GenBusVReg
   GenPl
   GenArea
   GenCtgInactive
@@ -206,11 +209,12 @@ display
   XfmrCtgInactive
   AreaCtgAffected
   BaseMVA
-  BusBaseKV
   BusVM
   BusVA
   BusVMax
   BusVMin
+  BusVMaxK
+  BusVMinK
   LoadP
   LoadQ
   FxshG
@@ -226,6 +230,7 @@ display
   LineB
   LineBCh
   LineFlowMax
+  LineFlowMaxK
   XfmrGMag
   XfmrBMag
   XfmrG
@@ -233,10 +238,11 @@ display
   XfmrRatio
   XfmrAng
   XfmrFlowMax
+  XfmrFlowMaxK
   SwshBInit
   SwshBMax
   SwshBMin
   GenPlX
   GenPlY
 ;
-$offtext
+#$offtext

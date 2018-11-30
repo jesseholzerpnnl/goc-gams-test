@@ -5,6 +5,8 @@ $offtext
 
 $eolcom #
 $include data_parameters.gms
+$include write_solution_worst_case.gms
+$exit
 $include algorithm_parameters.gms
 $include solution_parameters.gms
 $include variables.gms

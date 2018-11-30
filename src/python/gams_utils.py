@@ -4,7 +4,7 @@
 
 import gams, os, math
 
-def write_psse_to_gdx(psse_data, filename):
+def write_data_to_gdx(data, filename):
 
     # set up gams env and db
     ws = gams.GamsWorkspace()
@@ -12,12 +12,12 @@ def write_psse_to_gdx(psse_data, filename):
     db = ws.add_database()
     
     # write to db
-    write_psse_to_gdx_db(psse_data, db)
+    write_data_to_gdx_db(data, db)
     
     # export to gdx
     db.export(filename)
 
-def write_psse_to_gdx_db(psse_data, db):
+def write_data_to_gdx_db(data, db):
     '''Write to a Gams database.'''
     
     # declarations
@@ -43,7 +43,7 @@ def write_psse_to_gdx_db(psse_data, db):
     swsh_active = db.add_parameter('SwshActive', 1)
     gen_pl = db.add_set('GenPl', 3)
     ctg = db.add_set('Ctg', 1)
-    gen_bus_v_reg = db.add_set('GenBusVReg', 3)
+    #gen_bus_v_reg = db.add_set('GenBusVReg', 3)
     #swsh_bus_v_reg = db.add_set('SwshBusVReg', 2)
     #bus_area = db.add_set('BusArea', 2)
     gen_area = db.add_set('GenArea', 3)
@@ -56,7 +56,7 @@ def write_psse_to_gdx_db(psse_data, db):
     base_mva = db.add_parameter('BaseMVA', 0)
     
     # bus parameters
-    bus_base_kv = db.add_parameter('BusBaseKV', 1)
+    #bus_base_kv = db.add_parameter('BusBaseKV', 1)
     #bus_ide = db.add_parameter('bus_ide', 1)
     #bus_area = db.add_parameter('bus_area', 1)
     #bus_area = db.add_parameter('bus_area', 1)
@@ -65,8 +65,8 @@ def write_psse_to_gdx_db(psse_data, db):
     bus_va = db.add_parameter('BusVA', 1)
     bus_v_max = db.add_parameter('BusVMax', 1)
     bus_v_min = db.add_parameter('BusVMin', 1)
-    #bus_evhi = db.add_parameter('bus_evhi', 1)
-    #bus_evlo = db.add_parameter('bus_evlo', 1)
+    bus_v_max_k = db.add_parameter('BusVMaxK', 1)
+    bus_v_min_k = db.add_parameter('BusVMinK', 1)
     
     # load parameters
     #load_status = db.add_parameter('load_status', 2)
@@ -118,6 +118,7 @@ def write_psse_to_gdx_db(psse_data, db):
     line_b = db.add_parameter('LineB', 3)
     line_b_ch = db.add_parameter('LineBCh', 3)
     line_flow_max = db.add_parameter('LineFlowMax', 3)
+    line_flow_max_k = db.add_parameter('LineFlowMaxK', 3)
     #line_rateb = db.add_parameter('line_rateb', 3)
     #line_ratec = db.add_parameter('line_ratec', 3)
     #line_gi = db.add_parameter('line_gi', 3)
@@ -135,6 +136,7 @@ def write_psse_to_gdx_db(psse_data, db):
     xfmr_ratio = db.add_parameter('XfmrRatio', 3)
     xfmr_ang = db.add_parameter('XfmrAng', 3)
     xfmr_flow_max = db.add_parameter('XfmrFlowMax', 3)
+    xfmr_flow_max_k = db.add_parameter('XfmrFlowMaxK', 3)
     
     # switched shunt parameters
     #swsh_modsw = db.add_parameter('swsh_modsw', 1)
@@ -176,9 +178,9 @@ def write_psse_to_gdx_db(psse_data, db):
     
     # nums
     max_num = max(
-        [r.i for r in psse_data.raw.buses.values()] +
-        [r.area for r in psse_data.raw.buses.values()] +
-        [r.npairs for r in psse_data.rop.piecewise_linear_cost_functions.values()]
+        [r.i for r in data.raw.buses.values()] +
+        [r.area for r in data.raw.buses.values()] +
+        [r.npairs for r in data.rop.piecewise_linear_cost_functions.values()]
     )
     # might need more from other tables
     unique_nums = [str(i) for i in range(1, max_num + 1)]
@@ -187,29 +189,29 @@ def write_psse_to_gdx_db(psse_data, db):
     
     # idents
     unique_idents = list(set(
-        [r.id for r in psse_data.raw.loads.values()] +
-        [r.id for r in psse_data.raw.fixed_shunts.values()] +
-        [r.id for r in psse_data.raw.generators.values()] +
-        [r.ckt for r in psse_data.raw.nontransformer_branches.values()] +
-        [r.ckt for r in psse_data.raw.transformers.values()]))
+        [r.id for r in data.raw.loads.values()] +
+        [r.id for r in data.raw.fixed_shunts.values()] +
+        [r.id for r in data.raw.generators.values()] +
+        [r.ckt for r in data.raw.nontransformer_branches.values()] +
+        [r.ckt for r in data.raw.transformers.values()]))
     for i in unique_idents:
         ident.add_record(i)
         
     # names - just those from contingency labels
     unique_names = list(set(
-        [r.label for r in psse_data.con.contingencies.values()]))
+        [r.label for r in data.con.contingencies.values()]))
     for i in unique_names:
         name.add_record(i)
         
     # case identification records
-    base_mva.add_record().value = psse_data.raw.case_identification.sbase
+    base_mva.add_record().value = data.raw.case_identification.sbase
     
     # bus records
-    for r in psse_data.raw.buses.values():
+    for r in data.raw.buses.values():
         key = str(r.i)
         bus.add_record(key)
         #bus_name.add_record(key).value = r.name
-        bus_base_kv.add_record(key).value = r.baskv
+        #bus_base_kv.add_record(key).value = r.baskv
         #bus_ide.add_record(key).value = r.ide
         #bus_area.add_record(key).value = r.area
         #bus_owner.add_record(key).value = r.owner
@@ -218,48 +220,48 @@ def write_psse_to_gdx_db(psse_data, db):
         #print "bus va should be in radians?: %f" % (r.va * math.pi / 180.0) # todo remove this on checking correctness
         bus_v_max.add_record(key).value = r.nvhi
         bus_v_min.add_record(key).value = r.nvlo
-        #bus_evhi.add_record(key).value = r.evhi
-        #bus_evlo.add_record(key).value = r.evlo
+        bus_v_max_k.add_record(key).value = r.evhi
+        bus_v_min_k.add_record(key).value = r.evlo
         
     # load records
-    for r in psse_data.raw.loads.values():
+    for r in data.raw.loads.values():
         key = (str(r.i), str(r.id))
         load.add_record(key)
         if r.status > 0:
             load_active.add_record(key)
         #load_area.add_record(key).value = r.
         #load_area.add_record(key).value = r.
-        load_p.add_record(key).value = r.pl / psse_data.raw.case_identification.sbase
-        load_q.add_record(key).value = r.ql / psse_data.raw.case_identification.sbase
+        load_p.add_record(key).value = r.pl / data.raw.case_identification.sbase
+        load_q.add_record(key).value = r.ql / data.raw.case_identification.sbase
         #load_ip.add_record(key).value = r.
         #load_iq.add_record(key).value = r.
         #load_yp.add_record(key).value = r.
         #load_yq.add_record(key).value = r.
         
     # fixed shunt records
-    for r in psse_data.raw.fixed_shunts.values():
+    for r in data.raw.fixed_shunts.values():
         key = (str(r.i), str(r.id))
         fxsh.add_record(key)
         if r.status > 0:
             fxsh_active.add_record(key)
-        fxsh_g.add_record(key).value = r.gl / psse_data.raw.case_identification.sbase
-        fxsh_b.add_record(key).value = r.bl / psse_data.raw.case_identification.sbase
+        fxsh_g.add_record(key).value = r.gl / data.raw.case_identification.sbase
+        fxsh_b.add_record(key).value = r.bl / data.raw.case_identification.sbase
     
     # generator records
-    for r in psse_data.raw.generators.values():
+    for r in data.raw.generators.values():
         key = (str(r.i), str(r.id))
         gen.add_record(key)
         if r.stat > 0:
             gen_active.add_record(key).value
-        gen_pg.add_record(key).value = r.pg / psse_data.raw.case_identification.sbase
-        gen_qg.add_record(key).value = r.qg / psse_data.raw.case_identification.sbase
-        gen_q_max.add_record(key).value = r.qt / psse_data.raw.case_identification.sbase
-        gen_q_min.add_record(key).value = r.qb / psse_data.raw.case_identification.sbase
+        gen_pg.add_record(key).value = r.pg / data.raw.case_identification.sbase
+        gen_qg.add_record(key).value = r.qg / data.raw.case_identification.sbase
+        gen_q_max.add_record(key).value = r.qt / data.raw.case_identification.sbase
+        gen_q_min.add_record(key).value = r.qb / data.raw.case_identification.sbase
         #gen_vs.add_record(key).value = r.vs
-        if r.ireg == 0: # should process the default here - and document the default value - wait no we do not allow defaults
-            gen_bus_v_reg.add_record((str(r.i), str(r.id), str(r.i)))
-        else:
-            gen_bus_v_reg.add_record((str(r.i), str(r.id), str(r.ireg)))
+        #if r.ireg == 0: # should process the default here - and document the default value - wait no we do not allow defaults
+        #    gen_bus_v_reg.add_record((str(r.i), str(r.id), str(r.i)))
+        #else:
+        #    gen_bus_v_reg.add_record((str(r.i), str(r.id), str(r.ireg)))
         #gen_mbase.add_record(key).value = r.mbase
         #gen_zr.add_record(key).value = r.zr
         #gen_zx.add_record(key).value = r.zx
@@ -268,12 +270,12 @@ def write_psse_to_gdx_db(psse_data, db):
         #gen_gtap.add_record(key).value = r.gtap
         #gen_stat.add_record(key).value = r.stat
         #gen_rmpct.add_record(key).value = r.rmpct
-        gen_p_max.add_record(key).value = r.pt / psse_data.raw.case_identification.sbase
-        gen_p_min.add_record(key).value = r.pb / psse_data.raw.case_identification.sbase
-        gen_area.add_record((str(r.i), str(r.id), str(psse_data.raw.buses[r.i].area)))
+        gen_p_max.add_record(key).value = r.pt / data.raw.case_identification.sbase
+        gen_p_min.add_record(key).value = r.pb / data.raw.case_identification.sbase
+        gen_area.add_record((str(r.i), str(r.id), str(data.raw.buses[r.i].area)))
         
     # line records
-    for r in psse_data.raw.nontransformer_branches.values():
+    for r in data.raw.nontransformer_branches.values():
         key = (str(r.i), str(r.j), str(r.ckt))
         line.add_record(key)
         if r.st > 0:
@@ -281,8 +283,9 @@ def write_psse_to_gdx_db(psse_data, db):
         line_g.add_record(key).value = r.r / (r.r**2.0 + r.x**2.0)
         line_b.add_record(key).value = -r.x / (r.r**2.0 + r.x**2.0)
         line_b_ch.add_record(key).value = r.b
-        line_flow_max.add_record(key).value = r.ratea / psse_data.raw.case_identification.sbase # todo - normalize - see below
-        #line_flow_max.add_record(key).value = r.ratea / psse_data.raw.bus_dict[r.i].basekv # todo - normalize - need to define this dict
+        line_flow_max.add_record(key).value = r.ratea / data.raw.case_identification.sbase # todo - normalize - see below
+        line_flow_max_k.add_record(key).value = r.ratec / data.raw.case_identification.sbase # todo - normalize - see below
+        #line_flow_max.add_record(key).value = r.ratea / data.raw.bus_dict[r.i].basekv # todo - normalize - need to define this dict
         #line_rateb.add_record(key).value = r.
         #line_ratec.add_record(key).value = r.
         #line_gi.add_record(key).value = r.
@@ -292,7 +295,7 @@ def write_psse_to_gdx_db(psse_data, db):
         #line_st.add_record(key).value = r.
         
     # transformer records
-    for r in psse_data.raw.transformers.values():
+    for r in data.raw.transformers.values():
         key = (str(r.i), str(r.j), str(r.ckt))
         xfmr.add_record(key)
         if r.stat > 0:
@@ -304,18 +307,19 @@ def write_psse_to_gdx_db(psse_data, db):
         xfmr_b.add_record(key).value = -r.x12 / (r.r12**2.0 + r.x12**2.0)
         xfmr_ratio.add_record(key).value = r.windv1 / r.windv2
         xfmr_ang.add_record(key).value = r.ang1 * math.pi / 180.0
-        xfmr_flow_max.add_record(key).value = r.rata1 / psse_data.raw.case_identification.sbase # todo normalize
+        xfmr_flow_max.add_record(key).value = r.rata1 / data.raw.case_identification.sbase # todo normalize
+        xfmr_flow_max_k.add_record(key).value = r.ratc1 / data.raw.case_identification.sbase # todo normalize
     
-    # area records - no area object for now - get this from bus records
-    #for r in psse_data.raw.areas.values():
+    # area records - no area object for now - get this from bus records - that is the way to do it anyway
+    #for r in data.raw.areas.values():
     #    key = str(r.i)
     #    area.add_record(key)
-    area_temp = sorted(set([r.area for r in psse_data.raw.buses.values()]))
+    area_temp = sorted(set([r.area for r in data.raw.buses.values()]))
     for i in area_temp:
         area.add_record(str(i))
     
     # switched shunt records
-    for r in psse_data.raw.switched_shunts.values():
+    for r in data.raw.switched_shunts.values():
         key = str(r.i)
         swsh.add_record(key)
         if r.stat > 0:
@@ -329,7 +333,7 @@ def write_psse_to_gdx_db(psse_data, db):
         #    swsh_bus_v_reg.add_record((str(r.i), str(r.i)))
         #else:
         #    swsh_bus_v_reg.add_record((str(r.i), str(r.swrem)))
-        swsh_b_init.add_record(key).value = r.binit / psse_data.raw.case_identification.sbase # todo normalize ?
+        swsh_b_init.add_record(key).value = r.binit / data.raw.case_identification.sbase # todo normalize ?
         swsh_b_max.add_record(key).value = (
             max(0.0, r.n1 * r.b1) +
             max(0.0, r.n2 * r.b2) +
@@ -338,7 +342,7 @@ def write_psse_to_gdx_db(psse_data, db):
             max(0.0, r.n5 * r.b5) +
             max(0.0, r.n6 * r.b6) +
             max(0.0, r.n7 * r.b7) +
-            max(0.0, r.n8 * r.b8)) / psse_data.raw.case_identification.sbase # todo normalize ?
+            max(0.0, r.n8 * r.b8)) / data.raw.case_identification.sbase # todo normalize ?
         swsh_b_min.add_record(key).value = (
             min(0.0, r.n1 * r.b1) +
             min(0.0, r.n2 * r.b2) +
@@ -347,46 +351,46 @@ def write_psse_to_gdx_db(psse_data, db):
             min(0.0, r.n5 * r.b5) +
             min(0.0, r.n6 * r.b6) +
             min(0.0, r.n7 * r.b7) +
-            min(0.0, r.n8 * r.b8)) / psse_data.raw.case_identification.sbase # todo normalize ?
+            min(0.0, r.n8 * r.b8)) / data.raw.case_identification.sbase # todo normalize ?
     
     # generator inl records
-    for r in psse_data.inl.generator_inl_records.values():
+    for r in data.inl.generator_inl_records.values():
         key = (str(r.i), str(r.id))
         gen_part_fact.add_record(key).value = r.r
     
     # piecewise linear cost functions
-    for r in psse_data.rop.generator_dispatch_records.values():
+    for r in data.rop.generator_dispatch_records.values():
         r_bus = r.bus
         r_genid = r.genid
         r_dsptbl = r.dsptbl
-        s = psse_data.rop.active_power_dispatch_records[r_dsptbl]
+        s = data.rop.active_power_dispatch_records[r_dsptbl]
         r_ctbl = s.ctbl
-        t = psse_data.rop.piecewise_linear_cost_functions[r_ctbl]
+        t = data.rop.piecewise_linear_cost_functions[r_ctbl]
         r_npairs = t.npairs
         for i in range(r_npairs):
             key = (str(r_bus), str(r_genid), str(i + 1))
             gen_pl.add_record(key)
-            gen_pl_x.add_record(key).value = t.points[i].x / psse_data.raw.case_identification.sbase
+            gen_pl_x.add_record(key).value = t.points[i].x / data.raw.case_identification.sbase
             gen_pl_y.add_record(key).value = t.points[i].y            
     
     # contingency records
     # TODO - stll need gen_ctg_part_fact
     # and area_ctg_affected will need to be done more carefully
     area_ctg_affected_temp = set()
-    for r in psse_data.con.contingencies.values():
+    for r in data.con.contingencies.values():
         key = str(r.label)
         ctg.add_record(key)
         for e in r.branch_out_events:
             ekey = (str(e.i), str(e.j), str(e.ckt), key)
-            area_ctg_affected_temp.add((str(psse_data.raw.buses[e.i].area), key))
-            area_ctg_affected_temp.add((str(psse_data.raw.buses[e.j].area), key))
-            if (e.i, e.j, e.ckt) in psse_data.raw.nontransformer_branches.keys():
+            area_ctg_affected_temp.add((str(data.raw.buses[e.i].area), key))
+            area_ctg_affected_temp.add((str(data.raw.buses[e.j].area), key))
+            if (e.i, e.j, e.ckt) in data.raw.nontransformer_branches.keys():
                 line_ctg_inactive.add_record(ekey)
-            if (e.i, e.j, 0, e.ckt) in psse_data.raw.transformers.keys():
+            if (e.i, e.j, 0, e.ckt) in data.raw.transformers.keys():
                 xfmr_ctg_inactive.add_record(ekey)
         for e in r.generator_out_events:
             ekey = (str(e.i), str(e.id), key)
-            area_ctg_affected_temp.add((str(psse_data.raw.buses[e.i].area), key))
+            area_ctg_affected_temp.add((str(data.raw.buses[e.i].area), key))
             gen_ctg_inactive.add_record(ekey)
     for k in area_ctg_affected_temp:
         area_ctg_affected.add_record(k)

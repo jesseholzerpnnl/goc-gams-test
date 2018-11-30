@@ -4,11 +4,7 @@ MyPython2.py
 Entry to Python/GAMS benchmark solver, untimed portion.
 Syntax:
 
-$ python MyPython2.py RAW ROP INL CON
-
-or
-
-$ python MyPython2.py RAW ROP INL CON SOL1 SOL2
+$ python MyPython1.py CON INL RAW ROP TIMELIMIT SCOREMETHOD NETWORKMODEL
 
 nothing yet
 currently all processing is done in MyPython1.py
@@ -30,15 +26,15 @@ def main():
     rop_name = args[2]
     inl_name = args[3]
     con_name = args[4]
-    if len(args) > 6:
-        sol1_name = args[5]
-        sol2_name = args[6]
-    else:
-        sol1_name = 'solution1.txt'
-        sol2_name = 'solution2.txt'
+    time_limit = args[5]
+    score_method = args[6]
+    network_model = args[7]
 
-    print '\nPython/GAMS benchmark solver'
-    print 'MyPython2.py'
+    sol1_name = 'solution1.txt'
+    sol2_name = 'solution2.txt'
+
+    print('\nPython/GAMS benchmark solver')
+    print('MyPython2.py')
 
 if __name__ == '__main__':
     main()
